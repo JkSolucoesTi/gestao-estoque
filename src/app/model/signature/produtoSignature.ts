@@ -2,7 +2,7 @@ export class ProdutoSignature{
     id:number;
     codigo:number;
     nome:string;
-    fornecedor:number;
+    fornecedorId:number;
     quantidade:number;
     compra:number;
 }

@@ -15,8 +15,6 @@ import { MatDividerModule } from '@angular/material/divider';
 import { ReactiveFormsModule } from '@angular/forms';
 import { NgxMaskDirective, NgxMaskPipe } from 'ngx-mask';
 
-
-
 @NgModule({
   declarations: [
     CadastroFornecedorComponent,

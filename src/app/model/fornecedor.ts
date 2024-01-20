@@ -5,8 +5,9 @@ import { Responsavel } from "./responsavel";
 export class Fornecedor{
     id : number;
     razaoSocial : string;
-    cnpj:number;
-    inscricaoEstadual:number;
+    cnpj:string;
+    inscricaoEstadual:string;
+    
     endereco : Endereco;
     ramoDeAtividade: Ramo;
     responsavel:Responsavel;

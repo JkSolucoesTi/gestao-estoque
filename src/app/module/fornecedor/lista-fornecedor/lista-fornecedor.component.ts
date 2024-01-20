@@ -16,7 +16,6 @@ import { FornecedorService } from 'src/app/services/fornecedor.service';
 export class ListaFornecedorComponent {
 
   displayedColumns: string[] = ['razaoSocial','cnpj', 'inscricaoEstadual','Ação'];
-
   fornecedor : Fornecedor[]=[]
   dataSource = new MatTableDataSource(this.fornecedor);
 
@@ -28,12 +27,12 @@ export class ListaFornecedorComponent {
     ){
   }
 
-  ngOnInit(): void {
+  ngOnInit(): void { 
     this.fornecedorService.Obter().subscribe(x => {
       this.ObterFornecedores(x);
       this.dataSource.data = this.fornecedor;      
     },error => {
-      this.modalService.AbrirModal(error.message);})
+      this.modalService.AbrirModal("Não foi possível listar os fornecedores, tente novamente mais tarde");})
   }
 
   Editar(codigo : number){
@@ -47,7 +46,7 @@ export class ListaFornecedorComponent {
       fornecedor.id = x.id;
       fornecedor.razaoSocial = x.razaoSocial;
       fornecedor.cnpj = x.cnpj;
-      fornecedor.inscricaoEstadual = x.inscricaoEstadual
+      fornecedor.inscricaoEstadual = x.ie
       this.fornecedor.push(fornecedor);
     })
   }
@@ -70,5 +69,9 @@ export class ListaFornecedorComponent {
     }
   }
 
+  Excluir(codigo:number,nome:string){
+    let url = "";
+    this.modalService.AbrirModalDelete(`Deseja excluir o fornecedor ${nome} ?`,codigo,url);
+  }
 
 }

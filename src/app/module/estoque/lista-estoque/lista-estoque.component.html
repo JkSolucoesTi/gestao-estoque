@@ -29,19 +29,22 @@
       
         <ng-container matColumnDef="Compra">
           <th mat-header-cell *matHeaderCellDef  style="text-align: right;background-color: beige;"> Compra </th>
-          <td mat-cell *matCellDef="let element" style="text-align: right;">{{element.compra | currencyFormat }}</td>
+          <td mat-cell *matCellDef="let element" style="text-align: right;">{{element.compra | currency:'BRL':'symbol':'1.2-2'}}</td>
         </ng-container>    
 
         <ng-container matColumnDef="Ação">
             <th mat-header-cell *matHeaderCellDef  style="text-align: right;padding-right: 50px;background-color: beige;">Ação</th>
             <td mat-cell *matCellDef="let element" style="text-align: right;">
-                    <button mat-mini-fab color="accent" style="margin: 0 5px;" 
-                    
+
+                    <button mat-mini-fab color="accent" style="margin: 0 5px;"                     
                     (click)="Editar(element.id)">
                         <mat-icon>edit</mat-icon>
                       </button>
-                    <button mat-mini-fab color="warn" style="margin: 0 5px;">
-                      <mat-icon>delete</mat-icon>
+              
+                      <button mat-mini-fab color="warn" style="margin: 0 5px;"
+                      (click)="Excluir(element.id,element.nome)"
+                      >                        
+                        <mat-icon>delete</mat-icon>
                     </button>              
             </td>
           </ng-container>

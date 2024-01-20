@@ -13,7 +13,6 @@ export class PrecoComponent {
   }
 
   onClick(){
-    console.log('passei por aqui');
     this.modalService.AbrirModal('Teste do modulo de preços');
   }
 

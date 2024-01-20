@@ -55,9 +55,7 @@
             <mat-form-field appearance="outline" style="width: 350px;">
                 <mat-label>Ramo de Atividade</mat-label>
                 <mat-select formControlName="ramoAtividade">
-                <mat-option value="1">Industria</mat-option>
-                <mat-option value="2">Comercio</mat-option>
-                <mat-option value="3">Serviço</mat-option>
+                <mat-option *ngFor="let ramo of ramoAtividadeResponse" [value]="ramo.id">{{ramo.nome}}</mat-option>
                 </mat-select>
                 <mat-error *ngIf="!formularioFornecedor.hasError('required')">
                     Preenchimento obrigatório

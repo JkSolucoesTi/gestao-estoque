@@ -42,19 +42,19 @@ export class CadastroEstoqueComponent {
     })
   }
   ngOnInit(): void {
-
+    
     this.fornecedorService.Obter().subscribe(x => {
       this.ObterFornecedores(x);
     })   
     this.TelaEditar();
   }
 
-  TelaEditar(){
+  TelaEditar(){    
     this.activatedRoute.paramMap.subscribe(params =>{
       this.codigoProduto = params.get('codigo');
       if(this.codigoProduto > 0){
       this.estoqueService.ObterPorCodigo(this.codigoProduto).subscribe(estoque => {   
-        let editar = this.ObterProduto(estoque);     
+        let editar = this.ObterProduto(estoque);   
         this.SetarFormulario(editar);
         this.ParametrosTela(true);
         })
@@ -75,28 +75,27 @@ export class CadastroEstoqueComponent {
     this.carregamento = false;
   }
 
-  ObterProduto(estoqueResponse:EstoqueResponse[]) : Estoque{
+  ObterProduto(estoqueResponse:EstoqueResponse) : Estoque{
 
-    let estoque = new Estoque();
-    estoque.codigo = estoqueResponse[0].codigo
-    estoque.compra = estoqueResponse[0].compra
-    estoque.quantidade = estoqueResponse[0].quantidade
-    estoque.nome = estoqueResponse[0].nome
-    estoque.fornecedor.id = estoqueResponse[0].fornecedor
+    let estoque = new Estoque();    
+    estoque.codigo = estoqueResponse.codigo
+    estoque.compra = estoqueResponse.compra
+    estoque.quantidade = estoqueResponse.quantidade
+    estoque.nome = estoqueResponse.nome
+    estoque.fornecedorId = estoqueResponse.fornecedorId
     return estoque;
   }
 
-  SetarFormulario(estoque : Estoque){
+  SetarFormulario(estoque : Estoque){    
     this.formProduto.get('codigo').setValue(estoque.codigo);
     this.formProduto.get('nome').setValue(estoque.nome);
-    this.formProduto.get('fornecedor').setValue(estoque.fornecedor.id);
-    this.formProduto.get('quantidade').setValue(estoque.quantidade);
-    this.formProduto.get('compra').setValue(estoque.compra);
+    this.formProduto.get('fornecedor').setValue(estoque.fornecedorId);
+    this.formProduto.get('quantidade').setValue(estoque.quantidade);    
+    this.formProduto.get('compra').setValue(estoque.compra * 100);
   }
 
   ObterFornecedores(fornecedorResponse : FornecedorResponse[]){
     fornecedorResponse.forEach(x =>{
-
       let fornecedor = new Fornecedor;
       fornecedor.id = x.id;
       fornecedor.razaoSocial = x.razaoSocial;      
@@ -106,24 +105,47 @@ export class CadastroEstoqueComponent {
 
   IncluirProduto(){
     let produtoSignature = new ProdutoSignature();
-    produtoSignature.codigo = this.codigo;
+    produtoSignature.codigo = Number(this.codigo);
     produtoSignature.nome = this.nome;
-    produtoSignature.fornecedor = this.fornecedor;
-    produtoSignature.quantidade = this.quantidade;
-    produtoSignature.compra = this.compra;
+    produtoSignature.fornecedorId = Number(this.fornecedor);
+    produtoSignature.quantidade = Number(this.quantidade);
+    produtoSignature.compra = Number(this.compra / 100);
 
     if(this.editar){
       produtoSignature.id = this.codigoProduto;
-      this.estoqueService.Atualizar(produtoSignature).subscribe(retorno =>{
-        this.modalService.AbrirModal(`Produto ${retorno.nome} atualizado`)      
-        this.router.navigate(['/dashboard/estoque/listar']);
-      })
+      this.estoqueService.Atualizar(produtoSignature).subscribe(retorno =>{    
+        if(retorno)
+        {
+          this.modalService.AbrirModal(`Produto atualizado`)      
+          this.router.navigate(['/dashboard/estoque/listar']);          
+        }
+        else
+        {
+          this.modalService.AbrirModal("Não foi possível atualizar o produto no estoque");      
+          this.router.navigate(['/dashboard/estoque/listar']);    
+        }
+      },error => {
 
-    }else{
+        this.modalService.AbrirModal("Estamos enfrentando problemas");      
+      }
+      
+      )
+    }else{      
       this.estoqueService.Incluir(produtoSignature).subscribe(retorno =>{
-        this.modalService.AbrirModal(`Produto ${retorno.nome} incluido no estoque`)      
-        this.router.navigate(['/dashboard/estoque/listar']);
-      })
+        if(retorno)
+        {
+          this.modalService.AbrirModal("Produto incluido no estoque") ;    
+          this.router.navigate(['/dashboard/estoque/listar']);  
+        } 
+        else
+        {
+          this.modalService.AbrirModal("Não foi possível incluir o produto no estoque")      
+          this.router.navigate(['/dashboard/estoque/listar']);    
+        }
+      },error => {
+        this.modalService.AbrirModal("Estamos enfrentando problemas");      
+      }
+      )
     }
   }
 

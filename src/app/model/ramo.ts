@@ -1,4 +1,4 @@
 export class Ramo{
-    id:number;
+    idRamoAtividade:number;
     atividade:string;
 }

@@ -9,14 +9,14 @@ import { Observable, delay, of } from 'rxjs';
 })
 export class LoginService {
 
-  private url : string = "http://localhost:3000/login"
+  private url : string = 'https://localhost:7060/api/Autenticacao/Login';
 
   constructor(private httpClient : HttpClient) { }
 
-  Login(loginSignature:LoginSignature) : Observable<LoginResponse[]>{
-   let parametros = `${this.url}?usuario=${loginSignature.usuario}&senha=${loginSignature.senha}`;
-   /*Será utilizado apenas para desenvolvimento*/
-  return this.httpClient.get<LoginResponse[]>(parametros).pipe(
+
+  Login(loginSignature:LoginSignature) : Observable<any>{
+   let parametros = `${this.url}`;
+  return this.httpClient.post<any>(parametros,loginSignature).pipe(
     delay(2000)
   )
   }

@@ -6,7 +6,7 @@ import { ModalService } from 'src/app/emitter/modal.service';
 import { LoginResponse } from 'src/app/model/response/loginResponse';
 import { LoginSignature } from 'src/app/model/signature/loginSignature';
 import { LoginService } from 'src/app/services/login.service';
-import { ModalComponent } from 'src/app/shared/modal/modal.component';
+import { ModalComponent } from 'src/app/shared/modal/information/modal.component';
 
 @Component({
   selector: 'app-login',
@@ -40,13 +40,13 @@ export class LoginComponent {
    loginSignature.senha = this.senha;
 
    const myObserver = {
-    next: (x: LoginResponse[]) =>{ 
-      if(x.length> 0 && x[0].sucess === true){
+    next: (x: LoginResponse) =>{ 
+      if(x.success === true){
         this.router.navigateByUrl('dashboard/home/page');
       }else{
         this.modalService.AbrirModal("Não foi possível realizar o login , tente novamente")
         this.loding =false;
-      }
+     }
     },
     error: (err: any) => {      
       this.modalService.AbrirModal(err.message);
@@ -65,8 +65,6 @@ export class LoginComponent {
   }
 
   EnterSubmit(event : any,form : any) {
-    console.log(form.status);
-
   if (event.keyCode === 13 && form.status === "VALID") { 
     this.EfetuarLogin();
   } 

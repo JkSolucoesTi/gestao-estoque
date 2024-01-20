@@ -15,7 +15,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MAT_DATE_LOCALE, MatNativeDateModule } from '@angular/material/core';
-import { ModalComponent } from './shared/modal/modal.component';
+import { ModalComponent } from './shared/modal/information/modal.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { LoginComponent } from './pages/login/login.component';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
@@ -29,6 +29,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { provideNgxMask } from 'ngx-mask';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { LoaderComponent } from './shared/loader/loader.component';
+import { ModalDeleteComponent } from './shared/modal/delete/modal-delete.component';
 
 @NgModule({
   declarations: [
@@ -37,7 +38,8 @@ import { LoaderComponent } from './shared/loader/loader.component';
     ModalComponent,
     LoginComponent,
     DashboardComponent,
-    LoaderComponent
+    LoaderComponent,
+    ModalDeleteComponent
       ],
   imports: [
     BrowserModule,

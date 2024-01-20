@@ -29,15 +29,28 @@ export class ListaEstoqueComponent {
               private modalService:ModalService){    
 }
   ngOnInit(): void {
+    this.modalService.emitterObter.subscribe(x =>{
+
+        this.estoqueService.Obter().subscribe(x =>{
+          var atualizar = this.ObterEstoqueAtualizado(x);
+          this.dataSource.data = atualizar;  
+        },error => {
+          this.modalService.AbrirModal("Estamos enfrentando problemas");
+        });      
+    })
+
     this.estoqueService.Obter().subscribe(x =>{
       this.ObterEstoque(x);
       this.dataSource.data = this.estoque;  
     },error => {
-      this.modalService.AbrirModal(error.message);
+      this.modalService.AbrirModal("Estamos enfrentando problemas");
     });    
   }
 
-  ObterEstoque(estoqueResponse : EstoqueResponse[]){
+  ObterEstoqueAtualizado(estoqueResponse : EstoqueResponse[]):Estoque[]
+  {
+    let estoqueAtualizado : Estoque[]=[];
+
     estoqueResponse.forEach(x =>{
 
       let estoque = new Estoque();
@@ -46,10 +59,25 @@ export class ListaEstoqueComponent {
       estoque.nome = x.nome;
       estoque.quantidade = x.quantidade
       estoque.compra = x.compra;
+
+      estoqueAtualizado.push(estoque);
+    })
+    return estoqueAtualizado
+  }
+
+  ObterEstoque(estoqueResponse : EstoqueResponse[]){
+     estoqueResponse.forEach(x =>{
+
+      let estoque = new Estoque();
+      estoque.id = x.id;
+      estoque.codigo = x.codigo;
+      estoque.nome = x.nome;
+      estoque.quantidade = x.quantidade
+      estoque.compra = x.compra;
+
       this.estoque.push(estoque);
     })
   }
-
 
   @ViewChild(MatPaginator) paginator: any ;
   @ViewChild(MatSort) sort: any;
@@ -72,5 +100,10 @@ export class ListaEstoqueComponent {
 
   Editar(codigo:number){
     this.router.navigate([`/dashboard/estoque/cadastro-produto/${codigo}`]);   
+  }
+
+  Excluir(codigo:number,nome:string){
+    let url = Component.name;
+    this.modalService.AbrirModalDelete(`Deseja excluir o produto ${nome} ?`,codigo,url);
   }
 }

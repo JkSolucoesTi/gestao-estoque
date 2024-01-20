@@ -4,10 +4,13 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ModalService } from 'src/app/emitter/modal.service';
 import { Endereco } from 'src/app/model/endereco';
 import { Fornecedor } from 'src/app/model/fornecedor';
+import { Ramo } from 'src/app/model/ramo';
 import { Responsavel } from 'src/app/model/responsavel';
 import { FornecedorResponse } from 'src/app/model/response/fornecedorResponse';
+import { RamoAtividadeResponse } from 'src/app/model/response/ramoAtividadeResponse';
 import { FornecedorSignature } from 'src/app/model/signature/fornecedorSignature';
 import { FornecedorService } from 'src/app/services/fornecedor.service';
+import { RamoAtividadeService } from 'src/app/services/ramo-atividade.service';
 
 @Component({
   selector: 'app-cadastro-fornecedor',
@@ -21,11 +24,13 @@ export class CadastroFornecedorComponent {
   id: any;
   formularioFornecedor:any;
   fornecedorSignature : FornecedorSignature;
+  ramoAtividadeResponse : RamoAtividadeResponse[];
 
   constructor(
               private activetedRoute : ActivatedRoute,
               private router:Router, 
               private fornecedorService : FornecedorService , 
+              private ramoAtividadeService : RamoAtividadeService,
               private modalService : ModalService){
 
     this.formularioFornecedor = new FormGroup({
@@ -45,14 +50,23 @@ export class CadastroFornecedorComponent {
 
   }
   ngOnInit(): void {
+
+    this.ramoAtividadeService.Obter().subscribe(x => {
+      console.log(x)
+      this.ramoAtividadeResponse= x;
+    })
+
     this.activetedRoute.paramMap.subscribe(params =>{
       this.id = params.get('codigo');
       if(this.id > 0){
         this.fornecedorService.ObterPorCodigo(this.id).subscribe(x =>{
           let editar = this.ObterFornecedor(x)
+          console.log(editar);
           this.SetarFormulario(editar);
           this.ParametrosTela(true)
         })
+
+
       }
       else{
         this.ParametrosTela(false);
@@ -70,12 +84,42 @@ export class CadastroFornecedorComponent {
     }
   }
 
+  ObterFornecedor(response : FornecedorResponse) : Fornecedor
+  {
+    let fornecedor = new Fornecedor();
+    fornecedor.razaoSocial = response.razaoSocial;
+    fornecedor.cnpj = response.cnpj;
+    fornecedor.inscricaoEstadual = response.ie;
+
+    let ramoAtividade = new Ramo();
+    ramoAtividade.idRamoAtividade = response.idRamoAtividade;
+    fornecedor.ramoDeAtividade = ramoAtividade;
+
+    let endereco = new Endereco();
+    endereco.rua = response.rua;
+    endereco.cidade = response.cidade;
+    endereco.bairro = response.bairro;
+    endereco.estado = response.estado;
+    endereco.cep = response.cep;
+
+    let responsavel = new Responsavel();
+    responsavel.email = response.email;
+    responsavel.nome = response.nome;
+    responsavel.funcao = response.funcao;
+
+    fornecedor.endereco = endereco;
+    fornecedor.responsavel = responsavel;
+    fornecedor.ramoDeAtividade = ramoAtividade;
+
+    return fornecedor;
+  }
+
 
   SetarFormulario(fornecedor : Fornecedor){
     this.formularioFornecedor.get('razaoSocial').setValue(fornecedor.razaoSocial);
     this.formularioFornecedor.get('cnpj').setValue(fornecedor.cnpj);
     this.formularioFornecedor.get('inscricaoEstadual').setValue(fornecedor.inscricaoEstadual);
-    this.formularioFornecedor.get('ramoAtividade').setValue(fornecedor.ramoDeAtividade);
+    this.formularioFornecedor.get('ramoAtividade').setValue(fornecedor.ramoDeAtividade.idRamoAtividade);
     this.formularioFornecedor.get('cep').setValue(fornecedor.endereco.cep);
     this.formularioFornecedor.get('rua').setValue(fornecedor.endereco.rua);
     this.formularioFornecedor.get('bairro').setValue(fornecedor.endereco.bairro);
@@ -88,76 +132,47 @@ export class CadastroFornecedorComponent {
 
 
   Incluir(){
-    this.fornecedorSignature = this.ObterFornecedores();
+    this.fornecedorSignature = new FornecedorSignature();
+    //fornecedor
+    this.fornecedorSignature.razaoSocial = this.razaoSocial;
+    this.fornecedorSignature.cnpj = this.cnpj;
+    this.fornecedorSignature.inscricaoEstadual = this.inscricaoEstadual;
+    this.fornecedorSignature.idRamoAtividade = this.ramoAtividade;
+
+    //endereco
+    this.fornecedorSignature.cep = this.cep;
+    this.fornecedorSignature.rua = this.rua;
+    this.fornecedorSignature.bairro = this.bairro;
+    this.fornecedorSignature.cidade = this.cidade;
+    this.fornecedorSignature.estado = this.estado;
+    //email
+    this.fornecedorSignature.nome = this.nome;
+    this.fornecedorSignature.funcao = this.funcao;
+    this.fornecedorSignature.email = this.email;
+
     if(this.editar){
       this.fornecedorSignature.id = this.id;
       this.fornecedorService.Atualizar(this.fornecedorSignature).subscribe(retorno =>{
         this.modalService.AbrirModal(`Produto ${this.fornecedorSignature.razaoSocial} foi atualizado`)      
         this.router.navigate(['/dashboard/fornecedor/listar']);
-      })
+      },error =>{
+        this.modalService.AbrirModal(`Não foi possível atualizar o Fornecedor selecionado`)      
+        this.router.navigate(['/dashboard/fornecedor/listar']);
+      }
+      )
 
     }else{
       this.fornecedorService.Incluir(this.fornecedorSignature).subscribe(x => {
         this.modalService.AbrirModal("Fornecedor incluido com sucesso")      
         this.router.navigate(['/dashboard/fornecedor/listar']);
-      })
+      },error =>{
+        this.modalService.AbrirModal("Não foi possível incluir o Fornecedor")      
+        this.router.navigate(['/dashboard/fornecedor/listar']);
+      });      
     }
   }
 
-  ObterFornecedor(fornecedorResponse : FornecedorResponse[]):Fornecedor
-  {
-    let fornecedor = new Fornecedor();
-    fornecedor.razaoSocial = fornecedorResponse[0].razaoSocial;
-    fornecedor.cnpj = fornecedorResponse[0].cnpj;
-    fornecedor.inscricaoEstadual = fornecedorResponse[0].inscricaoEstadual;
-    fornecedor.ramoDeAtividade = fornecedorResponse[0].ramoDeAtividade;
-    fornecedor.endereco = new Endereco();
-    fornecedor.endereco.bairro = fornecedorResponse[0].endereco.bairro;
-    fornecedor.endereco.cep = fornecedorResponse[0].endereco.cep;
-    fornecedor.endereco.cidade = fornecedorResponse[0].endereco.cidade;
-    fornecedor.endereco.estado = fornecedorResponse[0].endereco.estado;
-    fornecedor.endereco.rua = fornecedorResponse[0].endereco.rua
-    fornecedor.responsavel = new Responsavel();
-    fornecedor.responsavel.email = fornecedorResponse[0].responsavel.email;
-    fornecedor.responsavel.funcao = fornecedorResponse[0].responsavel.funcao;
-    fornecedor.responsavel.nome = fornecedorResponse[0].responsavel.nome;
-    return fornecedor;
-  }
-
-
-  ObterFornecedores(): Fornecedor{
-    let fornecedor = new Fornecedor();
-    fornecedor.razaoSocial = this.razaoSocial;
-    fornecedor.cnpj = this.cnpj;
-    fornecedor.inscricaoEstadual = this.inscricaoEstadual;
-    fornecedor.ramoDeAtividade = this.ramoAtividade;
-    let endereco = this.ObterEndereco();
-    fornecedor.endereco = endereco;
-
-    let responsavel = this.ObterResponsavel();
-    fornecedor.responsavel = responsavel;
-    
-    return fornecedor;
-  }
-
-
-  ObterResponsavel(): Responsavel{
-    let responsavel = new Responsavel();
-    responsavel.email = this.email;
-    responsavel.funcao = this.funcao;
-    responsavel.nome = this.nome;
-    return responsavel;
-  }
-
-  ObterEndereco() : Endereco{
-    let endereco = new Endereco();
-    endereco.bairro = this.bairro;
-    endereco.cep = this.cep;
-    endereco.cidade = this.cidade;
-    endereco.estado = this.estado;
-    endereco.rua = this.rua
-    return endereco;
-  }
+ 
 
   Voltar(){
     this.router.navigate(['/dashboard/fornecedor/listar']);

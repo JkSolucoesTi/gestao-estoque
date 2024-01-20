@@ -3,12 +3,25 @@ import { Ramo } from "../ramo";
 import { Responsavel } from "../responsavel";
 
 export class FornecedorSignature{
+
+    constructor(){
+    }
+
     id: number;
     razaoSocial : string;
-    cnpj:number;
-    inscricaoEstadual:number;
-    ramoDeAtividade: Ramo;
-    endereco: Endereco;
-    responsavel:Responsavel;
-    
+    cnpj:string;
+    inscricaoEstadual:string;
+
+    idRamoAtividade:number;
+    atividade:string;
+
+    cep:string;
+    rua:string;
+    bairro:string;
+    cidade:string;
+    estado:string;
+
+    nome:string;
+    funcao:string;
+    email:string;    
 }
